@@ -38,7 +38,7 @@ architecture behavioral of booth_algorithm is
 
     -- Counter
     signal init_counter, incr_counter : std_logic := '0';
-    signal counter     : std_logic_vector(clog2(B_BITS)-1 downto 0)  := (others => '0');
+    signal counter     : std_logic_vector(clog2(B_BITS+1)-1 downto 0)  := (others => '0');
     signal end_of_loop : std_logic := '0';
 
     signal start_of_ones, end_of_ones : std_logic := '0';
