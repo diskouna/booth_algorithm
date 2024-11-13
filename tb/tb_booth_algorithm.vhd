@@ -42,8 +42,27 @@ begin
     clk <= not clk after 10 ns;
     rst <= '0'     after 40 ns;
 
-    a <= std_logic_vector(to_signed( 3, 8));
-    b <= std_logic_vector(to_signed(-4, 8));
-    a_b_valid <= '1';
+    process
+    begin
+        a <= std_logic_vector(to_signed(30, 8));
+        b <= std_logic_vector(to_signed(42, 8));
+        a_b_valid <= '1';
+        wait until c_valid = '1';
+
+        a <= std_logic_vector(to_signed(-3, 8));
+        b <= std_logic_vector(to_signed(-4, 8));
+        a_b_valid <= '1';
+        wait until c_valid = '1';
+
+        a <= std_logic_vector(to_signed(-30, 8));
+        b <= std_logic_vector(to_signed(-42, 8));
+        a_b_valid <= '1';
+        wait until c_valid = '1';
+    
+        a <= std_logic_vector(to_signed(-30, 8));
+        b <= std_logic_vector(to_signed( 42, 8));
+        a_b_valid <= '1';
+        wait until c_valid = '1';
+    end process;
 
 end architecture;
