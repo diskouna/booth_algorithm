@@ -1,0 +1,22 @@
+name: CI for booth_algorithm unit
+
+on:
+  push:
+    branches:
+       - main
+  pull_request:
+
+jobs:
+  vhdl-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Install GHDL
+        run: sudo apt update && sudo apt install -y ghdl
+            
+      - name: Run Simulation
+        run: make clean && make all
+
