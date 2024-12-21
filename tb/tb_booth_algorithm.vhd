@@ -39,30 +39,144 @@ begin
                                 c_o         => c
                           );
     
-    clk <= not clk after 10 ns;
-    rst <= '0'     after 40 ns;
+    clk <= not clk after 1 ns;
+    rst <= '0'     after 4 ns;
 
     process
+        variable expected_c : std_logic_vector(15 downto 0);
     begin
+        -- Test case 1 : Two positive numbers    
         a <= std_logic_vector(to_signed(30, 8));
         b <= std_logic_vector(to_signed(42, 8));
         a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(1260, 16)); -- 1260 = 
         wait until c_valid = '1';
-
+       
+        assert c = expected_c
+            report "Test Case 1 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+        
+        -- Test case 2 : Two negative numbers
         a <= std_logic_vector(to_signed(-3, 8));
         b <= std_logic_vector(to_signed(-4, 8));
         a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(12, 16));
         wait until c_valid = '1';
 
+        assert c = expected_c
+            report "Test Case 2 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+        
+        -- Test case 3 : Two negative numbers (bis)
         a <= std_logic_vector(to_signed(-30, 8));
         b <= std_logic_vector(to_signed(-42, 8));
         a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(1260, 16));
         wait until c_valid = '1';
     
+        assert c = expected_c
+            report "Test Case 3 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+        
+        -- Test case 4 : Positive and Negative numbers
         a <= std_logic_vector(to_signed(-30, 8));
         b <= std_logic_vector(to_signed( 42, 8));
         a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(-1260, 16));
         wait until c_valid = '1';
+
+        assert c = expected_c
+            report "Test Case 4 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+
+        -- Test case 5 : Zeros
+        a <= std_logic_vector(to_signed(0, 8));
+        b <= std_logic_vector(to_signed(0, 8));
+        a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(0, 16));
+        wait until c_valid = '1';
+
+        assert c = expected_c
+            report "Test Case 5 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+        
+        -- Test case 6 : Min and Max
+        a <= std_logic_vector(to_signed(127, 8));
+        b <= std_logic_vector(to_signed(-128, 8));
+        a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(-16256, 16));
+        wait until c_valid = '1';
+
+        assert c = expected_c
+            report "Test Case 6 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+        
+        -- Test case 7 : Min and Min
+        a <= std_logic_vector(to_signed(-128, 8));
+        b <= std_logic_vector(to_signed(-128, 8));
+        a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(16384, 16));
+        wait until c_valid = '1';
+
+        assert c = expected_c
+            report "Test Case 7 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+
+        -- Test case 8 : Max and Max
+        a <= std_logic_vector(to_signed(127, 8));
+        b <= std_logic_vector(to_signed(127, 8));
+        a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(16129, 16));
+        wait until c_valid = '1';
+
+        assert c = expected_c
+            report "Test Case 8 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+        
+        -- Test case 9 : Zero and Max
+        a <= std_logic_vector(to_signed(  0, 8));
+        b <= std_logic_vector(to_signed(127, 8));
+        a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(0, 16));
+        wait until c_valid = '1';
+
+        assert c = expected_c
+            report "Test Case 9 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+
+        -- Test case 10 : Zero and Min
+        a <= std_logic_vector(to_signed(   0, 8));
+        b <= std_logic_vector(to_signed(-128, 8));
+        a_b_valid <= '1';
+        expected_c := std_logic_vector(to_signed(0, 16));
+        wait until c_valid = '1';
+
+        assert c = expected_c
+            report "Test Case 10 Failed: Expected=" 
+                   &integer'image(to_integer(signed(expected_c))) &
+                   ", Got=" & integer'image(to_integer(signed(c)))
+            severity error;
+
+        assert false report "Simulation finished" severity failure;
+
     end process;
 
 end architecture;
