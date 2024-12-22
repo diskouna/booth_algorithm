@@ -41,7 +41,7 @@ architecture behavioral of booth_algorithm is
     signal counter     : std_logic_vector(clog2(B_BITS+1)-1 downto 0)  := (others => '0');
     signal end_of_loop : std_logic := '0';
 
-    signal start_of_ones, end_of_ones : std_logic := '0';
+    signal start_of_ones, start_of_zeros : std_logic := '0';
 
 begin
 
@@ -100,12 +100,12 @@ begin
     -- one bit comparaison should be enough ...
     start_of_ones <= '1' when (accumulator(1 downto 0) = "10") else
                      '0';
-    end_of_ones   <= '1' when (accumulator(1 downto 0) = "01") else
+    start_of_zeros   <= '1' when (accumulator(1 downto 0) = "01") else
                      '0';
     -- FSM
     
     STATE_TRAN_PROCESS : process (cur_state, a_b_valid_i, end_of_loop, 
-                                  start_of_ones, end_of_ones)
+                                  start_of_ones, start_of_zeros)
     begin
         load_accumulator  <= '0'; 
         shift_accumulator <= '0';
@@ -123,13 +123,14 @@ begin
                 if (a_b_valid_i = '1') then
                     nxt_state <= ZEROS_START;
                 end if;
+
             when ONES_START =>
                 if (end_of_loop = '1') then
                     nxt_state <= DONE;
                 else
                     incr_counter      <= '1';
                     shift_accumulator <= '1';
-                    if (end_of_ones = '1') then
+                    if (start_of_zeros = '1') then
                         add_multiplicand <= '1';
                         nxt_state <= ZEROS_START;
                     else
@@ -145,7 +146,7 @@ begin
                     if (start_of_ones = '1') then
                         sub_multiplicand <= '1';
                         nxt_state <= ONES_START;
-                    elsif (end_of_ones = '1') then
+                    elsif (start_of_zeros = '1') then
                         add_multiplicand <= '1';
                         nxt_state <= ZEROS_START;
                     else 
