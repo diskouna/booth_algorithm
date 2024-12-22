@@ -23,7 +23,7 @@ entity booth_algorithm is
 end entity;
 
 architecture behavioral of booth_algorithm is 
-    type state_t is (IDLE, ONES_START, ONES_OR_ZEROS_STREAM, ONES_END, DONE); 
+    type state_t is (IDLE, ONES_START, ONES_OR_ZEROS_STREAM, ZEROS_START, DONE); 
     signal cur_state, nxt_state : state_t;
 
     signal ext_pos_a : std_logic_vector(A_BITS+B_BITS downto 0); 
@@ -121,7 +121,7 @@ begin
                 load_accumulator <= '1';
                 init_counter     <= '1';
                 if (a_b_valid_i = '1') then
-                    nxt_state <= ONES_END;
+                    nxt_state <= ZEROS_START;
                 end if;
             when ONES_START =>
                 if (end_of_loop = '1') then
@@ -131,7 +131,7 @@ begin
                     shift_accumulator <= '1';
                     if (end_of_ones = '1') then
                         add_multiplicand <= '1';
-                        nxt_state <= ONES_END;
+                        nxt_state <= ZEROS_START;
                     else
                         nxt_state <= ONES_OR_ZEROS_STREAM;
                     end if;
@@ -147,12 +147,12 @@ begin
                         nxt_state <= ONES_START;
                     elsif (end_of_ones = '1') then
                         add_multiplicand <= '1';
-                        nxt_state <= ONES_END;
+                        nxt_state <= ZEROS_START;
                     else 
                         nxt_state <= ONES_OR_ZEROS_STREAM;
                     end if; 
                 end if;
-            when ONES_END =>
+            when ZEROS_START =>
                 if (end_of_loop = '1') then
                     nxt_state <= DONE;
                 else
