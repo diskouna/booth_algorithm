@@ -175,7 +175,9 @@ begin
                    ", Got=" & integer'image(to_integer(signed(c)))
             severity error;
 
-        assert false report "Simulation finished" severity failure;
+        assert false report "Simulation completed" severity note;
+
+        wait;
 
     end process;
 
