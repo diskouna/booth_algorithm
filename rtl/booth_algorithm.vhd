@@ -124,46 +124,34 @@ begin
                 end if;
             
             when ONES_OR_ZEROS_STREAM =>
-                    incr_counter      <= '1';
-                    shift_accumulator <= '1';
-                    if    (start_of_ones  = '1') then -- 10
-                        sub_multiplicand <= '1';
-                        if (end_of_loop = '1') then
-                            nxt_state <= DONE;
-                        else
-                            nxt_state <= ONES_START;
-                        end if;
-                    elsif (start_of_zeros = '1') then -- 01
-                        add_multiplicand <= '1';
-                        if (end_of_loop = '1') then
-                            nxt_state <= DONE;
-                        else
-                            nxt_state <= ZEROS_START;
-                        end if;
-                    else                              -- 00 / 11
-                        if (end_of_loop = '1') then
-                            nxt_state <= DONE;
-                        else
-                            nxt_state <= ONES_OR_ZEROS_STREAM;
-                        end if;
-                    end if; 
+                incr_counter      <= '1';
+                shift_accumulator <= '1';
+                if    (start_of_ones  = '1') then -- 10
+                    sub_multiplicand <= '1';
+                    nxt_state <= ONES_START;
+                elsif (start_of_zeros = '1') then -- 01
+                    add_multiplicand <= '1';
+                    nxt_state <= ZEROS_START;
+                else                              -- 00 / 11
+                    nxt_state <= ONES_OR_ZEROS_STREAM;
+                end if; 
+                
+                if (end_of_loop = '1') then
+                    nxt_state <= DONE; -- overwrite nxt_state
+                end if;
 
             when ONES_START =>
                 incr_counter      <= '1';
                 shift_accumulator <= '1';
                 if (start_of_zeros = '1') then  -- 01
                     add_multiplicand <= '1';
-                    if (end_of_loop = '1') then
-                        nxt_state <= DONE;
-                    else
-                        nxt_state <= ZEROS_START;
-                    end if;
+                    nxt_state <= ZEROS_START;
                 else                            -- 11
-                    if (end_of_loop = '1') then
-                        nxt_state <= DONE;
-                    else
-                        nxt_state <= ONES_OR_ZEROS_STREAM;
-                    end if;
+                    nxt_state <= ONES_OR_ZEROS_STREAM;
+                end if;
+                
+                if (end_of_loop = '1') then
+                    nxt_state <= DONE; -- overwrite nxt_state
                 end if;
 
             when ZEROS_START =>
@@ -171,19 +159,15 @@ begin
                 shift_accumulator <= '1';
                 if (start_of_ones = '1') then   -- 10
                     sub_multiplicand <= '1';
-                    if (end_of_loop = '1') then
-                        nxt_state <= DONE;
-                    else
-                        nxt_state <= ONES_START;
-                    end if;
+                    nxt_state <= ONES_START;
                 else                            -- 00
-                    if (end_of_loop = '1') then
-                        nxt_state <= DONE;
-                    else
-                        nxt_state <= ONES_OR_ZEROS_STREAM;
-                    end if;
+                    nxt_state <= ONES_OR_ZEROS_STREAM;
                 end if; 
 
+                if (end_of_loop = '1') then
+                    nxt_state <= DONE; -- overwrite nxt_state
+                end if;
+            
             when DONE =>
                 c_valid_o <= '1';
                 nxt_state <= IDLE;
