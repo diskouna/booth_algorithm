@@ -70,7 +70,7 @@ architecture behavioral of tb_booth_algorithm is
         wait until rising_edge(clk)  and c_valid = '1' and 
                    cons_ready = '1' ;
         c_value := to_integer(signed(c));
-        report "Got c=" & integer'image(c_value) severity note; 
+        report "Got c=" & integer'image(to_integer(signed(c))) severity note; 
     end procedure; 
 
     -- Checking procedure
