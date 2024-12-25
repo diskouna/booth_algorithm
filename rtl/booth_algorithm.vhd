@@ -15,9 +15,11 @@ entity booth_algorithm is
     port (
         clk_i, rst_i    : in  std_logic;
         a_b_valid_i     : in  std_logic;
+        prod_ready_o    : out std_logic;
         a_i             : in  std_logic_vector(A_BITS-1 downto 0);        
         b_i             : in  std_logic_vector(B_BITS-1 downto 0); 
         c_valid_o       : out std_logic;
+        cons_ready_i    : in  std_logic;
         c_o             : out std_logic_vector(A_BITS+B_BITS-1 downto 0)  
     );
 end entity;
@@ -113,13 +115,15 @@ begin
         init_counter      <= '0';
         incr_counter      <= '0';
         c_valid_o         <= '0';
+        prod_ready_o      <= '0';
 
         nxt_state <= cur_state;
         case (cur_state) is
             when IDLE =>
                 load_accumulator <= '1';
                 init_counter     <= '1';
-                if (a_b_valid_i = '1') then
+                prod_ready_o     <= '1';
+                if (a_b_valid_i = '1') then -- inputs handshake
                     nxt_state <= ONES_OR_ZEROS_STREAM; 
                 end if;
             
@@ -170,7 +174,9 @@ begin
             
             when DONE =>
                 c_valid_o <= '1';
-                nxt_state <= IDLE;
+                if (cons_ready_i = '1') then -- outputs  handshake
+                    nxt_state <= IDLE; 
+                end if;
 
             when others =>
                 nxt_state <= IDLE;

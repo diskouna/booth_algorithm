@@ -14,9 +14,11 @@ architecture behavioral of tb_booth_algorithm is
         port (
             clk_i, rst_i    : in  std_logic;
             a_b_valid_i     : in  std_logic;
+            prod_ready_o    : out std_logic;
             a_i             : in  std_logic_vector(A_BITS-1 downto 0);        
             b_i             : in  std_logic_vector(B_BITS-1 downto 0); 
             c_valid_o       : out std_logic;
+            cons_ready_i    : in  std_logic;
             c_o             : out std_logic_vector(A_BITS+B_BITS-1 downto 0) 
         );
     end component;
@@ -24,19 +26,22 @@ architecture behavioral of tb_booth_algorithm is
     signal  clk, rst  : std_logic := '1';
     signal  a_b_valid : std_logic := '0';
     signal  c_valid   : std_logic := '0';
+    signal  prod_ready, cons_ready : std_logic := '0';
     signal  a, b      : std_logic_vector(7 downto 0) := (others => '0');
     signal  c         : std_logic_vector(15 downto 0) := (others => '0');    
 begin
 
     UUT : booth_algorithm generic map (A_BITS => 8, B_BITS => 8)
                           port    map (
-                                clk_i       => clk,
-                                rst_i       => rst,
-                                a_b_valid_i => a_b_valid,
-                                a_i         => a,
-                                b_i         => b,
-                                c_valid_o   => c_valid,
-                                c_o         => c
+                                clk_i        => clk,
+                                rst_i        => rst,
+                                a_b_valid_i  => a_b_valid,
+                                prod_ready_o => prod_ready,   
+                                a_i          => a,
+                                b_i          => b,
+                                c_valid_o    => c_valid,
+                                cons_ready_i => cons_ready,
+                                c_o          => c
                           );
     
     clk <= not clk after 1 ns;
@@ -45,12 +50,15 @@ begin
     process
         variable expected_c : std_logic_vector(15 downto 0);
     begin
+        cons_ready <= '1';
+
         -- Test case 1 : Two positive numbers    
         a <= std_logic_vector(to_signed(30, 8));
         b <= std_logic_vector(to_signed(42, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(1260, 16)); -- 1260 = 
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
        
         assert c = expected_c
             report "Test Case 1 Failed: Expected=" 
@@ -62,8 +70,9 @@ begin
         a <= std_logic_vector(to_signed(-3, 8));
         b <= std_logic_vector(to_signed(-4, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(12, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
 
         assert c = expected_c
             report "Test Case 2 Failed: Expected=" 
@@ -75,8 +84,9 @@ begin
         a <= std_logic_vector(to_signed(-30, 8));
         b <= std_logic_vector(to_signed(-42, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(1260, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
     
         assert c = expected_c
             report "Test Case 3 Failed: Expected=" 
@@ -88,8 +98,9 @@ begin
         a <= std_logic_vector(to_signed(-30, 8));
         b <= std_logic_vector(to_signed( 42, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(-1260, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
 
         assert c = expected_c
             report "Test Case 4 Failed: Expected=" 
@@ -101,8 +112,9 @@ begin
         a <= std_logic_vector(to_signed(0, 8));
         b <= std_logic_vector(to_signed(0, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(0, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
 
         assert c = expected_c
             report "Test Case 5 Failed: Expected=" 
@@ -114,8 +126,9 @@ begin
         a <= std_logic_vector(to_signed(127, 8));
         b <= std_logic_vector(to_signed(-128, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(-16256, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
 
         assert c = expected_c
             report "Test Case 6 Failed: Expected=" 
@@ -127,8 +140,9 @@ begin
         a <= std_logic_vector(to_signed(-128, 8));
         b <= std_logic_vector(to_signed(-128, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(16384, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
 
         assert c = expected_c
             report "Test Case 7 Failed: Expected=" 
@@ -140,8 +154,9 @@ begin
         a <= std_logic_vector(to_signed(127, 8));
         b <= std_logic_vector(to_signed(127, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(16129, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
 
         assert c = expected_c
             report "Test Case 8 Failed: Expected=" 
@@ -153,8 +168,9 @@ begin
         a <= std_logic_vector(to_signed(  0, 8));
         b <= std_logic_vector(to_signed(127, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(0, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
 
         assert c = expected_c
             report "Test Case 9 Failed: Expected=" 
@@ -166,8 +182,9 @@ begin
         a <= std_logic_vector(to_signed(   0, 8));
         b <= std_logic_vector(to_signed(-128, 8));
         a_b_valid <= '1';
+        wait until rising_edge(clk) and a_b_valid = '1' and prod_ready = '1'; 
         expected_c := std_logic_vector(to_signed(0, 16));
-        wait until c_valid = '1';
+        wait until rising_edge(clk) and c_valid = '1' and cons_ready = '1';
 
         assert c = expected_c
             report "Test Case 10 Failed: Expected=" 
