@@ -106,7 +106,7 @@ begin
     -- FSM
     
     STATE_TRAN_PROCESS : process (cur_state, a_b_valid_i, end_of_loop, 
-                                  start_of_ones, start_of_zeros)
+                                  start_of_ones, start_of_zeros, cons_ready_i)
     begin
         load_accumulator  <= '0'; 
         shift_accumulator <= '0';
