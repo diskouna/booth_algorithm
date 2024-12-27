@@ -23,3 +23,6 @@ jobs:
       - name: Run Simulation for reg_booth_algorithm
         run: make clean && make TOP_LEVEL=tb_reg_booth_algorithm
 
+      - name: Run Simulation for apb4_booth_algorithm
+        run: make clean && make TOP_LEVEL=tb_apb4_booth_algorithm
+

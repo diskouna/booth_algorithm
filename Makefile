@@ -2,6 +2,7 @@
 SRC = rtl/utils.vhd 
 SRC += rtl/booth_algorithm.vhd tb/tb_booth_algorithm.vhd 
 SRC += rtl/reg_booth_algorithm.vhd tb/tb_reg_booth_algorithm.vhd
+SRC += rtl/apb4_booth_algorithm.vhd tb/tb_apb4_booth_algorithm.vhd
 TOP_LEVEL ?= tb_booth_algorithm
 
 all: ${SRC}
