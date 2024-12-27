@@ -129,7 +129,11 @@ begin
             else
                 if (op_1_we = '1') then op_1_reg <= wdata_i; end if;
                 if (op_2_we = '1') then op_2_reg <= wdata_i; end if; 
-                if (control_we = '1') then control_reg <= wdata_i AND CTRL_MASK; end if;
+                if (control_we = '1') then 
+                    control_reg <= wdata_i AND CTRL_MASK; 
+                else
+                    control_reg <= CTRL_RESET_VALUE;
+                end if;
                 status_reg <= x"0000_000" & b"0" & overflow & result_valid & core_ready; 
                 if (result_valid = '1') then result_reg <= result (31 downto 0); end if;
             end if;

@@ -60,11 +60,6 @@ architecture behavioral of tb_reg_booth_algorithm is
         core_if_in.wdata_i <= x"0000_0001"; 
         core_if_in.we_i    <= '1';
         wait until rising_edge(clk);
-        -- TODO: handle clearing in the core
-        core_if_in.addr_i  <= CTRL_ADDR;
-        core_if_in.wdata_i <= x"0000_0000"; 
-        core_if_in.we_i    <= '1';
-        wait until rising_edge(clk);
         core_if_in.sel_i <= '0';
 
         report "Set a=" & integer'image(a_value) & " and b=" & integer'image(b_value)

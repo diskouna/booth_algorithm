@@ -14,10 +14,12 @@ package utils is
     constant CTRL_ADDR    : std_logic_vector(4 downto 2) := b"011"; 
     constant STAT_ADDR    : std_logic_vector(4 downto 2) := b"100"; 
     constant CORE_ID_ADDR : std_logic_vector(4 downto 2) := b"101"; 
-    
+
     constant CTRL_MASK : std_logic_vector(31 downto 0) := x"0000_0001";
     constant STAT_MASK : std_logic_vector(31 downto 0) := x"0000_0003";
     constant CORE_ID   : std_logic_vector(31 downto 0) := x"0000_0001";  
+
+    constant CTRL_RESET_VALUE : std_logic_vector(31 downto 0) := x"0000_0000";
 
 end package;
 
