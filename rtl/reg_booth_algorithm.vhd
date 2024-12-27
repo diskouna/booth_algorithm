@@ -22,6 +22,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.utils.all;
 
 entity reg_booth_algorithm is
     port (
@@ -29,7 +30,7 @@ entity reg_booth_algorithm is
         rst_i    : in  std_logic;
         sel_i    : in  std_logic;
         we_i     : in  std_logic; -- 1|0 : write|read
-        addr_i   : in  std_logic_vector(6 downto 2); -- 4 bytes aligned addresses
+        addr_i   : in  std_logic_vector(4 downto 2); -- 4 bytes aligned addresses
         wdata_i  : in  std_logic_vector(31 downto 0);
         rdata_o  : out std_logic_vector(31 downto 0)
     );
@@ -52,18 +53,7 @@ architecture behavioral of reg_booth_algorithm is
             c_o             : out std_logic_vector(A_BITS+B_BITS-1 downto 0)  
         );
     end component;
-
-    -- TODO: fix addresses size
-    constant OP_1_ADDR    : std_logic_vector(6 downto 2) := b"00000";  
-    constant OP_2_ADDR    : std_logic_vector(6 downto 2) := b"00001";  
-    constant RESULT_ADDR  : std_logic_vector(6 downto 2) := b"00010"; 
-    constant CTRL_ADDR    : std_logic_vector(6 downto 2) := b"00011"; 
-    constant STAT_ADDR    : std_logic_vector(6 downto 2) := b"00100"; 
-    constant CORE_ID_ADDR : std_logic_vector(6 downto 2) := b"00101"; 
     
-    constant CTRL_MASK : std_logic_vector(31 downto 0) := x"0000_0001";
-    constant STAT_MASK : std_logic_vector(31 downto 0) := x"0000_0003";
-    constant CORE_ID   : std_logic_vector(31 downto 0) := x"0000_0001";  
 
     signal op_1_reg   : std_logic_vector(31 downto 0); signal op_1_we   : std_logic;  
     signal op_2_reg   : std_logic_vector(31 downto 0); signal op_2_we   : std_logic;   

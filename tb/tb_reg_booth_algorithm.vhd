@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use work.utils.all;
 
 entity tb_reg_booth_algorithm is 
 end entity;
@@ -12,7 +13,7 @@ architecture behavioral of tb_reg_booth_algorithm is
             rst_i    : in  std_logic;
             sel_i    : in  std_logic;
             we_i     : in  std_logic; -- 1|0 : write|read
-            addr_i   : in  std_logic_vector(6 downto 2); -- 4 bytes aligned addresses
+            addr_i   : in  std_logic_vector(4 downto 2); -- 4 bytes aligned addresses
             wdata_i  : in  std_logic_vector(31 downto 0);
             rdata_o  : out std_logic_vector(31 downto 0)
         );
@@ -24,7 +25,7 @@ architecture behavioral of tb_reg_booth_algorithm is
     type booth_if_t is record
         sel_i    : std_logic;
         we_i     : std_logic;
-        addr_i   : std_logic_vector(6 downto 2);        
+        addr_i   : std_logic_vector(4 downto 2);        
         wdata_i  : std_logic_vector(31 downto 0);
         rdata_o  : std_logic_vector(31 downto 0);
     end record;
@@ -33,12 +34,6 @@ architecture behavioral of tb_reg_booth_algorithm is
 
     -- BFM procedures 
 
-    constant OP_1_ADDR    : std_logic_vector(6 downto 2) := b"00000";  
-    constant OP_2_ADDR    : std_logic_vector(6 downto 2) := b"00001";  
-    constant RESULT_ADDR  : std_logic_vector(6 downto 2) := b"00010"; 
-    constant CTRL_ADDR    : std_logic_vector(6 downto 2) := b"00011"; 
-    constant STAT_ADDR    : std_logic_vector(6 downto 2) := b"00100"; 
-    constant CORE_ID_ADDR : std_logic_vector(6 downto 2) := b"00101"; 
 
     procedure set_operands(signal clk        : in std_logic;
                            signal core_if_out: in booth_if_t;
