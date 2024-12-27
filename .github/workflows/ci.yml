@@ -17,6 +17,9 @@ jobs:
       - name: Install GHDL
         run: sudo apt update && sudo apt install -y ghdl
             
-      - name: Run Simulation
+      - name: Run Simulation for booth_algorithm
         run: make clean && make all
+
+      - name: Run Simulation for reg_booth_algorithm
+        run: make clean && make TOP_LEVEL=tb_reg_booth_algorithm
 
