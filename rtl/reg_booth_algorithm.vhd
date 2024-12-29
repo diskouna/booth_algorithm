@@ -81,7 +81,9 @@ begin
                                 c_o          => result 
                            );
 
-    overflow <= '0'; --TODO: Fix me
+    overflow <= '0' when result(63 downto 31) = x"FFFF_FFFF"&"1" else --ie result is a sign-extension of
+                '0' when result(63 downto 31) = x"0000_0000"&"0" else --   result(31 downto 0);
+                '1';
 
     -- Addresses decoder 
     process(sel_i, we_i, addr_i, core_ready, 

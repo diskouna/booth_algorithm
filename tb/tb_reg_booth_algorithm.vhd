@@ -70,12 +70,15 @@ architecture behavioral of tb_reg_booth_algorithm is
                          signal core_if_out: in  booth_if_t;
                          signal core_if_in : out booth_if_t;
                          variable c_value  : out integer) is
+        variable overflow : boolean := false;
     begin
         core_if_in.sel_i <= '1';
         -- Read result valid flag
         core_if_in.we_i <= '0';
         core_if_in.addr_i <= STAT_ADDR;
-        wait until rising_edge(clk) and core_if_out.rdata_o(1) = '1'; 
+        wait until rising_edge(clk) and core_if_out.rdata_o(1) = '1';
+        -- Read overflow flag
+        overflow := (core_if_out.rdata_o(2) = '1'); 
         -- Read result
         core_if_in.we_i <= '0';
         core_if_in.addr_i <= RESULT_ADDR;
@@ -83,7 +86,9 @@ architecture behavioral of tb_reg_booth_algorithm is
         c_value := to_integer(signed(core_if_out.rdata_o));
         core_if_in.sel_i <= '0';
 
-        report "Got c=" & integer'image(to_integer(signed(core_if_out.rdata_o))) severity note; 
+        report "Got c=" & integer'image(to_integer(signed(core_if_out.rdata_o))) & 
+               "    Overflow : " & boolean'image(overflow)  
+            severity note; 
     end procedure; 
 
     -- Checking procedure

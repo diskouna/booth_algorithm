@@ -111,6 +111,7 @@ architecture behavioral of tb_apb4_booth_algorithm is
                          signal core_if_out: in  booth_if_t;
                          signal core_if_in : out booth_if_t;
                          variable c_value  : out integer) is
+        variable overflow : boolean;
     begin
         core_if_in.PSEL <= '1';
         -- Polling result valid flag
@@ -125,7 +126,8 @@ architecture behavioral of tb_apb4_booth_algorithm is
             core_if_in.PENABLE <= '1';
             wait until rising_edge(clk) and core_if_out.PREADY = '1';        
         end loop;
-
+        -- Read overflow flag
+        overflow := (core_if_out.PRDATA(2) = '1');
         -- Read result
         --  Setup phase
         wait until rising_edge(clk);
@@ -141,7 +143,9 @@ architecture behavioral of tb_apb4_booth_algorithm is
         wait until rising_edge(clk);
         core_if_in.PSEL  <= '0';
 
-        report "Got c=" & integer'image(to_integer(signed(core_if_out.PRDATA))) severity note; 
+        report "Got c=" & integer'image(to_integer(signed(core_if_out.PRDATA))) & 
+               "    Overflow : " & boolean'image(overflow)  
+            severity note; 
     end procedure; 
 
     -- Checking procedure
