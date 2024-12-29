@@ -38,7 +38,7 @@ architecture behavioral of tb_booth_algorithm is
     signal  booth_if_in, booth_if_out : booth_if_t;
 
     -- BFM procedures    
-    procedure set_operands(signal clk        : in std_logic;
+    procedure set_operands(signal clk_p      : in std_logic;
                            signal core_if_out: in booth_if_t;
                            signal core_if_in : out booth_if_t;
                            constant a_value, b_value : in  integer) is
@@ -46,19 +46,19 @@ architecture behavioral of tb_booth_algorithm is
         core_if_in.a_i <= std_logic_vector(to_signed(a_value, core_if_in.a_i'length));
         core_if_in.b_i <= std_logic_vector(to_signed(b_value, core_if_in.b_i'length));
         core_if_in.a_b_valid_i <= '1';
-        wait until rising_edge(clk) and core_if_out.prod_ready_o = '1';
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p) and core_if_out.prod_ready_o = '1';
+        wait until rising_edge(clk_p);
         core_if_in.a_b_valid_i <= '0';
         report "Set a=" & integer'image(a_value) & " and b=" & integer'image(b_value)
                severity note; 
     end procedure; 
 
-    procedure get_result(signal clk        : in  std_logic;
+    procedure get_result(signal clk_p      : in  std_logic;
                          signal core_if_out: in  booth_if_t;
                          signal core_if_in : out booth_if_t;
                          variable c_value  : out integer) is
     begin
-        wait until rising_edge(clk)  and core_if_out.c_valid_o = '1'; 
+        wait until rising_edge(clk_p)  and core_if_out.c_valid_o = '1';
                    -- and core_if_in.cons_ready_i = '1' ;
         c_value := to_integer(signed(core_if_out.c_o));
         report "Got c=" & integer'image(to_integer(signed(core_if_out.c_o))) severity note; 

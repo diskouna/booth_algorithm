@@ -35,7 +35,7 @@ architecture behavioral of tb_reg_booth_algorithm is
     -- BFM procedures 
 
 
-    procedure set_operands(signal clk        : in std_logic;
+    procedure set_operands(signal clk_p      : in std_logic;
                            signal core_if_out: in booth_if_t;
                            signal core_if_in : out booth_if_t;
                            constant a_value, b_value : in  integer) is
@@ -44,29 +44,29 @@ architecture behavioral of tb_reg_booth_algorithm is
         -- Read core ready flag
         core_if_in.we_i <= '0';
         core_if_in.addr_i <= STAT_ADDR;
-        wait until rising_edge(clk) and core_if_out.rdata_o(0) = '1';
+        wait until rising_edge(clk_p) and core_if_out.rdata_o(0) = '1';
         -- Write operand a
         core_if_in.addr_i  <= OP_1_ADDR;
         core_if_in.wdata_i <= std_logic_vector(to_signed(a_value, core_if_in.wdata_i'length)); 
         core_if_in.we_i    <= '1';
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         -- Write operand b
         core_if_in.addr_i  <= OP_2_ADDR;
         core_if_in.wdata_i <= std_logic_vector(to_signed(b_value, core_if_in.wdata_i'length)); 
         core_if_in.we_i    <= '1';
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         -- Write operation enable flag
         core_if_in.addr_i  <= CTRL_ADDR;
         core_if_in.wdata_i <= x"0000_0001"; 
         core_if_in.we_i    <= '1';
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         core_if_in.sel_i <= '0';
 
         report "Set a=" & integer'image(a_value) & " and b=" & integer'image(b_value)
                severity note; 
     end procedure; 
 
-    procedure get_result(signal clk        : in  std_logic;
+    procedure get_result(signal clk_p      : in  std_logic;
                          signal core_if_out: in  booth_if_t;
                          signal core_if_in : out booth_if_t;
                          variable c_value  : out integer) is
@@ -76,13 +76,13 @@ architecture behavioral of tb_reg_booth_algorithm is
         -- Read result valid flag
         core_if_in.we_i <= '0';
         core_if_in.addr_i <= STAT_ADDR;
-        wait until rising_edge(clk) and core_if_out.rdata_o(1) = '1';
+        wait until rising_edge(clk_p) and core_if_out.rdata_o(1) = '1';
         -- Read overflow flag
         overflow := (core_if_out.rdata_o(2) = '1'); 
         -- Read result
         core_if_in.we_i <= '0';
         core_if_in.addr_i <= RESULT_ADDR;
-        wait until rising_edge(clk); 
+        wait until rising_edge(clk_p); 
         c_value := to_integer(signed(core_if_out.rdata_o));
         core_if_in.sel_i <= '0';
 
