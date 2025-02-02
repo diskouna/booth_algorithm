@@ -8,12 +8,12 @@ package utils is
     function clog2(number : positive) return positive;
  
     -- Registers interface 
-    constant OP_1_ADDR    : std_logic_vector(4 downto 2) := b"000";  
-    constant OP_2_ADDR    : std_logic_vector(4 downto 2) := b"001";  
-    constant RESULT_ADDR  : std_logic_vector(4 downto 2) := b"010"; 
-    constant CTRL_ADDR    : std_logic_vector(4 downto 2) := b"011"; 
-    constant STAT_ADDR    : std_logic_vector(4 downto 2) := b"100"; 
-    constant CORE_ID_ADDR : std_logic_vector(4 downto 2) := b"101"; 
+    constant OP_1_ADDR    : std_logic_vector(4 downto 0) := b"000_00";  
+    constant OP_2_ADDR    : std_logic_vector(4 downto 0) := b"001_00";  
+    constant RESULT_ADDR  : std_logic_vector(4 downto 0) := b"010_00"; 
+    constant CTRL_ADDR    : std_logic_vector(4 downto 0) := b"011_00"; 
+    constant STAT_ADDR    : std_logic_vector(4 downto 0) := b"100_00"; 
+    constant CORE_ID_ADDR : std_logic_vector(4 downto 0) := b"101_00"; 
 
     constant CTRL_MASK : std_logic_vector(31 downto 0) := x"0000_0001";
     constant STAT_MASK : std_logic_vector(31 downto 0) := x"0000_0003";

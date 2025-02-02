@@ -13,7 +13,7 @@ architecture behavioral of tb_reg_booth_algorithm is
             rst_i    : in  std_logic;
             sel_i    : in  std_logic;
             we_i     : in  std_logic; -- 1|0 : write|read
-            addr_i   : in  std_logic_vector(4 downto 2); -- 4 bytes aligned addresses
+            addr_i   : in  std_logic_vector(4 downto 0); -- 4 bytes aligned addresses
             wdata_i  : in  std_logic_vector(31 downto 0);
             rdata_o  : out std_logic_vector(31 downto 0)
         );
@@ -25,7 +25,7 @@ architecture behavioral of tb_reg_booth_algorithm is
     type booth_if_t is record
         sel_i    : std_logic;
         we_i     : std_logic;
-        addr_i   : std_logic_vector(4 downto 2);        
+        addr_i   : std_logic_vector(4 downto 0);
         wdata_i  : std_logic_vector(31 downto 0);
         rdata_o  : std_logic_vector(31 downto 0);
     end record;

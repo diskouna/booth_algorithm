@@ -12,7 +12,7 @@ architecture behavioral of tb_apb4_booth_algorithm is
             PCLK     : in  std_logic; 
             PRESETn  : in  std_logic;
             
-            PADDR    : in  std_logic_vector(4 downto 2);
+            PADDR    : in  std_logic_vector(4 downto 0);
             PSEL     : in  std_logic; 
             PENABLE  : in  std_logic;
             PWRITE   : in  std_logic;
@@ -27,7 +27,7 @@ architecture behavioral of tb_apb4_booth_algorithm is
     signal rstn   : std_logic := '1';
     
     type booth_if_t is record
-        PADDR    :  std_logic_vector(4 downto 2);
+        PADDR    :  std_logic_vector(4 downto 0);
         PSEL     :  std_logic; 
         PENABLE  :  std_logic;
         PWRITE   :  std_logic;
