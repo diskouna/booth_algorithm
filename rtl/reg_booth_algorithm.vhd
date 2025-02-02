@@ -30,7 +30,7 @@ entity reg_booth_algorithm is
         rst_i    : in  std_logic;
         sel_i    : in  std_logic;
         we_i     : in  std_logic; -- 1|0 : write|read
-        addr_i   : in  std_logic_vector(4 downto 2); -- 4 bytes aligned addresses
+        addr_i   : in  std_logic_vector(4 downto 0); -- 4 bytes aligned addresses
         wdata_i  : in  std_logic_vector(31 downto 0);
         rdata_o  : out std_logic_vector(31 downto 0)
     );
@@ -81,7 +81,9 @@ begin
                                 c_o          => result 
                            );
 
-    overflow <= '0'; --TODO: Fix me
+    overflow <= '0' when result(63 downto 31) = x"FFFF_FFFF"&"1" else --ie result is a sign-extension of
+                '0' when result(63 downto 31) = x"0000_0000"&"0" else --   result(31 downto 0);
+                '1';
 
     -- Addresses decoder 
     process(sel_i, we_i, addr_i, core_ready, 

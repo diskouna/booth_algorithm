@@ -12,7 +12,7 @@ architecture behavioral of tb_apb4_booth_algorithm is
             PCLK     : in  std_logic; 
             PRESETn  : in  std_logic;
             
-            PADDR    : in  std_logic_vector(4 downto 2);
+            PADDR    : in  std_logic_vector(4 downto 0);
             PSEL     : in  std_logic; 
             PENABLE  : in  std_logic;
             PWRITE   : in  std_logic;
@@ -27,7 +27,7 @@ architecture behavioral of tb_apb4_booth_algorithm is
     signal rstn   : std_logic := '1';
     
     type booth_if_t is record
-        PADDR    :  std_logic_vector(4 downto 2);
+        PADDR    :  std_logic_vector(4 downto 0);
         PSEL     :  std_logic; 
         PENABLE  :  std_logic;
         PWRITE   :  std_logic;
@@ -40,7 +40,7 @@ architecture behavioral of tb_apb4_booth_algorithm is
     signal  booth_if_in, booth_if_out : booth_if_t;
 
     -- BFM procedures 
-    procedure set_operands(signal clk        : in std_logic;
+    procedure set_operands(signal clk_p      : in std_logic;
                            signal core_if_out: in booth_if_t;
                            signal core_if_in : out booth_if_t;
                            constant a_value, b_value : in  integer) is
@@ -49,13 +49,13 @@ architecture behavioral of tb_apb4_booth_algorithm is
         core_if_in.PSEL  <= '1';
         -- Polling core ready flag
         while rdata(0) = '0' loop
-            wait until rising_edge(clk); -- Setup phase
+            wait until rising_edge(clk_p); -- Setup phase
             core_if_in.PENABLE <= '0';
             core_if_in.PADDR   <= STAT_ADDR;
             core_if_in.PWRITE  <= '0';
-            wait until rising_edge(clk); -- Access phase 
+            wait until rising_edge(clk_p); -- Access phase 
             core_if_in.PENABLE <= '1';
-            wait until rising_edge(clk) and core_if_out.PREADY = '1';        
+            wait until rising_edge(clk_p) and core_if_out.PREADY = '1';
             rdata := core_if_out.PRDATA;
             
         end loop;
@@ -64,85 +64,89 @@ architecture behavioral of tb_apb4_booth_algorithm is
         --  Setup phase
         core_if_in.PENABLE <= '0';
         core_if_in.PADDR   <= OP_1_ADDR;
-        core_if_in.PWDATA  <= std_logic_vector(to_signed(a_value, core_if_in.PWDATA'length)); 
+        core_if_in.PWDATA  <= std_logic_vector(to_signed(a_value, core_if_in.PWDATA'length));
         core_if_in.PWRITE  <= '1';
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         --  Access phase
         core_if_in.PENABLE <= '1';
-        wait until rising_edge(clk) and core_if_out.PREADY = '1';
+        wait until rising_edge(clk_p) and core_if_out.PREADY = '1';
         core_if_in.PWRITE  <= '0';
         
         -- Write operand b
         --  Setup phase
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         core_if_in.PENABLE <= '0';
         core_if_in.PADDR   <= OP_2_ADDR;
-        core_if_in.PWDATA  <= std_logic_vector(to_signed(b_value, core_if_in.PWDATA'length)); 
+        core_if_in.PWDATA  <= std_logic_vector(to_signed(b_value, core_if_in.PWDATA'length));
         core_if_in.PWRITE  <= '1';
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         --  Access phase
         core_if_in.PENABLE <= '1';
-        wait until rising_edge(clk) and core_if_out.PREADY = '1';
+        wait until rising_edge(clk_p) and core_if_out.PREADY = '1';
         core_if_in.PWRITE  <= '0';
 
         -- Write operation enable flag
         --  Setup phase
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         core_if_in.PENABLE <= '0';
         core_if_in.PADDR   <= CTRL_ADDR;
-        core_if_in.PWDATA  <= x"0000_0001"; 
+        core_if_in.PWDATA  <= x"0000_0001";
         core_if_in.PWRITE  <= '1';
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         --  Access phase
         core_if_in.PENABLE <= '1';
-        wait until rising_edge(clk) and core_if_out.PREADY = '1';
+        wait until rising_edge(clk_p) and core_if_out.PREADY = '1';
         core_if_in.PWRITE  <= '0';
 
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         core_if_in.PSEL    <= '0';
         core_if_in.PENABLE <= '0';
         core_if_in.PWRITE  <= '0';
 
         report "Set a=" & integer'image(a_value) & " and b=" & integer'image(b_value)
-               severity note; 
-    end procedure; 
+               severity note;
+    end procedure;
 
-    procedure get_result(signal clk        : in  std_logic;
+    procedure get_result(signal clk_p      : in  std_logic;
                          signal core_if_out: in  booth_if_t;
                          signal core_if_in : out booth_if_t;
                          variable c_value  : out integer) is
+        variable overflow : boolean;
     begin
         core_if_in.PSEL <= '1';
         -- Polling result valid flag
         while core_if_out.PRDATA(1) = '0' loop
             --  Setup phase
-            wait until rising_edge(clk);
+            wait until rising_edge(clk_p);
             core_if_in.PENABLE <= '0';
             core_if_in.PADDR   <= STAT_ADDR;
             core_if_in.PWRITE  <= '0';
-            wait until rising_edge(clk);
+            wait until rising_edge(clk_p);
             --  Access phase
             core_if_in.PENABLE <= '1';
-            wait until rising_edge(clk) and core_if_out.PREADY = '1';        
+            wait until rising_edge(clk_p) and core_if_out.PREADY = '1';
         end loop;
-
+        -- Read overflow flag
+        overflow := (core_if_out.PRDATA(2) = '1');
         -- Read result
         --  Setup phase
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         core_if_in.PENABLE <= '0';
         core_if_in.PADDR   <= RESULT_ADDR;
         core_if_in.PWRITE  <= '0';
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         --  Access phase
         core_if_in.PENABLE <= '1';
-        wait until rising_edge(clk) and core_if_out.PREADY = '1'; 
+        wait until rising_edge(clk_p) and core_if_out.PREADY = '1';
         c_value := to_integer(signed(core_if_out.PRDATA));
 
-        wait until rising_edge(clk);
+        wait until rising_edge(clk_p);
         core_if_in.PSEL  <= '0';
 
-        report "Got c=" & integer'image(to_integer(signed(core_if_out.PRDATA))) severity note; 
-    end procedure; 
+        report "Got c=" & integer'image(to_integer(signed(core_if_out.PRDATA))) & 
+               "    Overflow : " & boolean'image(overflow)  
+            severity note;
+    end procedure;
 
     -- Checking procedure
     procedure check_result(constant result, expected_result : in integer;
@@ -180,7 +184,7 @@ begin
         
         rstn <= '0';
         wait for 4 ns;
-        rstn <= '1';  
+        rstn <= '1';
         report "Reset generation done" severity note;
         
         -- Test case 1 : Two positive numbers    
